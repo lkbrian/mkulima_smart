@@ -91,7 +91,6 @@ tools = [fetch_user_weather_data_for_use_in_advice]
 llm_with_tools = llm.bind_tools(tools)
 load_dotenv()
 
-
 def generate_llm_response(user_message: str):
     system_message = {
         "role": "system",
