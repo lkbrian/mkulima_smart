@@ -4,7 +4,7 @@ from flask_restful import Api
 from flask_cors import CORS
 from config import config
 from models import db
-from resources import HealthCheckResource, FarmingTipsResource
+from resources import HealthCheckResource, FarmingTipsResource, SMSCallBack
 
 
 def create_app(config_name=None):
@@ -14,7 +14,8 @@ def create_app(config_name=None):
 
     app = Flask(__name__)
     app.config.from_object(config[config_name])
-
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     # Initialize extensions
     db.init_app(app)
     CORS(app)
@@ -23,6 +24,7 @@ def create_app(config_name=None):
     api = Api(app)
     # Add SMS API resources
     api.add_resource(HealthCheckResource, "/health")
+    api.add_resource(SMSCallBack, "/sms/callback")
     api.add_resource(FarmingTipsResource, "/farming/tips")
 
     @app.route("/")
