@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  # Flask Application
+  web:
+    build: .
+    container_name: mkulima_web
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://mkulima_user:mkulima_password@db:5432/mkulima_smart
+      - SECRET_KEY=your-production-secret-key-here
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - mkulima_network
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: mkulima_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - mkulima_network
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  mkulima_network:
+    driver: bridge
