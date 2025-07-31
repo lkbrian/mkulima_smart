@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import (
     Column,
     Integer,
+    MetaData,
     String,
     Text,
     DateTime,
@@ -12,7 +13,12 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-db = SQLAlchemy()
+metadata = MetaData(
+    naming_convention={
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    }
+)
+db = SQLAlchemy(metadata=metadata)
 
 
 class User(db.Model):

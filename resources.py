@@ -1,42 +1,36 @@
 import os
 from datetime import datetime
 import africastalking
-from flask import request, jsonify
+from flask import make_response, request, jsonify
 from flask_restful import Resource
 
 # Initialize Africa's Talking
 username = os.environ.get("AFRICASTALKING_USERNAME", "sandbox")
-api_key = os.environ.get("AFRICASTALKING_API_KEY")
+api_key = os.environ.get("AFRICASTALKING_API_KEY", "")
 
 africastalking.initialize(username, api_key)
 
 sms = africastalking.SMS
 
 
-class SMSCallback(Resource):
+class SMSCallBack(Resource):
     def post(self, request):
         data = request.get_json()
-        phone_number = data.get("phoneNumber")
-
-        # the Phone number should start with country code + 254712345678 -> format
+        phone_number = data.get("from")  # Works for both form data and query string
+        print("Incoming SMS or delivery report:", data)
         if not phone_number:
-            return jsonify({"message": "Phone number not found"}), 400
-
+            return make_response(jsonify({"message": "Phone number not found"}), 400)
         try:
             response = sms.send(
                 message="Hello from AfricasTalking!",
                 recipients=[phone_number],
-                sender_id="AFTKNG",  # your Alphanumeric sender ID
+                sender_id="6928",
             )
-
-            return jsonify({"status": "success", "data": response}), 200
+            return make_response(
+                jsonify({"status": "success", "response": response}), 200
+            )
         except Exception as e:
-            return (
-                jsonify(
-                    {"message": "An error occurred while sending SMS", "error": str(e)}
-                ),
-                500,
-            )
+            return make_response(jsonify({"error": str(e)}), 500)
 
 
 class HealthCheckResource(Resource):
