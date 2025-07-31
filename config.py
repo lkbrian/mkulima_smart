@@ -23,9 +23,14 @@ class Config:
     
     # LLM Configuration
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+    GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
     LANGCHAIN_API_KEY = os.environ.get('LANGCHAIN_API_KEY')
     LANGCHAIN_TRACING_V2 = os.environ.get('LANGCHAIN_TRACING_V2', 'false').lower() == 'true'
     LANGCHAIN_PROJECT = os.environ.get('LANGCHAIN_PROJECT', 'mkulima_smart')
+    
+    # Africa's Talking Configuration
+    AFRICASTALKING_USERNAME = os.environ.get('AFRICASTALKING_USERNAME', 'sandbox')
+    AFRICASTALKING_API_KEY = os.environ.get('AFRICASTALKING_API_KEY')
     
     # Application settings
     HOST = os.environ.get('HOST', '0.0.0.0')

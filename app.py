@@ -1,60 +1,50 @@
 import os
 from flask import Flask
 from flask_restful import Api
-from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from config import config
 from models import db
-from api.v1 import api_v1_bp
+from resources import HealthCheckResource, FarmingTipsResource
+
 
 def create_app(config_name=None):
     """Application factory pattern."""
     if config_name is None:
-        config_name = os.environ.get('FLASK_ENV', 'development')
-    
+        config_name = os.environ.get("FLASK_ENV", "development")
+
     app = Flask(__name__)
     app.config.from_object(config[config_name])
-    
+
     # Initialize extensions
     db.init_app(app)
-    jwt = JWTManager(app)
     CORS(app)
-    
-    # Register blueprints
-    app.register_blueprint(api_v1_bp, url_prefix='/api/v1')
-    
-    # Health check endpoint
-    @app.route('/health')
-    def health_check():
-        return {
-            "status": "healthy",
-            "version": "1.0.0",
-            "service": "mkulima-smart-api"
-        }
-    
-    @app.route('/')
+
+    # Create API
+    api = Api(app)
+    # Add SMS API resources
+    api.add_resource(HealthCheckResource, "/health")
+    api.add_resource(FarmingTipsResource, "/farming/tips")
+
+    @app.route("/")
     def index():
         return {
-            "message": "Mkulima Smart API",
+            "message": "Mkulima Smart SMS API",
             "version": "1.0.0",
-            "endpoints": {
-                "health": "/health",
-                "api_v1": "/api/v1",
-                "docs": "/api/v1/docs"
-            }
+            "description": "SMS-based farming insights using Africa's Talking and Groq LLM",
+            "endpoints": {"health": "/health", "farming_tips": "/farming/tips"},
         }
-    
+
+    # Create database tables
+    with app.app_context():
+        db.create_all()
+
     return app
 
-# Create the Flask application
+
 app = create_app()
 
-if __name__ == '__main__':
-    config_name = os.environ.get('FLASK_ENV', 'development')
+if __name__ == "__main__":
+    config_name = os.environ.get("FLASK_ENV", "development")
     app_config = config[config_name]
-    
-    app.run(
-        host=app_config.HOST,
-        port=app_config.PORT,
-        debug=app_config.DEBUG
-    )
+
+    app.run(host=app_config.HOST, port=app_config.PORT, debug=app_config.DEBUG)

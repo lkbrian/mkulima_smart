@@ -67,7 +67,7 @@ class ChatMessage(db.Model):
     session_id = Column(Integer, ForeignKey("chat_sessions.id"), nullable=False)
     message_type = Column(String(20), nullable=False)  # 'user' or 'assistant'
     content = Column(Text, nullable=False)
-    metadata = Column(Text, nullable=True)  # JSON string for additional data
+    chat_metadata = Column(Text, nullable=True)  # JSON string for additional data
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     def __repr__(self):
