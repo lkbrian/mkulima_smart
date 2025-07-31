@@ -4,6 +4,8 @@ import africastalking
 from flask import make_response, request, jsonify
 from flask_restful import Resource
 
+from llm import generate_llm_response
+
 # Initialize Africa's Talking
 username = os.environ.get("AFRICASTALKING_USERNAME", "sandbox")
 api_key = os.environ.get("AFRICASTALKING_API_KEY", "")
@@ -14,18 +16,21 @@ sms = africastalking.SMS
 
 
 class SMSCallBack(Resource):
-    def post(self, request):
+    def post(self):
         data = request.get_json()
-        phone_number = data.get("from")  # Works for both form data and query string
+        phone_number = data["from"]
+        message = data["text"]
         print("Incoming SMS or delivery report:", data)
         if not phone_number:
             return make_response(jsonify({"message": "Phone number not found"}), 400)
         try:
+
             response = sms.send(
-                message="Hello from AfricasTalking!",
+                message=generate_llm_response(message),
                 recipients=[phone_number],
                 sender_id="6928",
             )
+            print(f"response: {response}")
             return make_response(
                 jsonify({"status": "success", "response": response}), 200
             )

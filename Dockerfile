@@ -21,16 +21,16 @@ RUN pip install --no-cache-dir --upgrade pip \
 COPY . .
 
 # Create non-root user for security
-RUN adduser --disabled-password --gecos '' appuser \
-    && chown -R appuser:appuser /app
-USER appuser
+# RUN adduser --disabled-password --gecos '' appuser \
+#     && chown -R appuser:appuser /app
+# USER appuser
 
 # Expose port
-EXPOSE 5000
+EXPOSE 6928
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/health || exit 1
 
 # Run the application with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:6928", "--workers", "4", "--timeout", "120", "app:app"]
