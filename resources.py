@@ -8,7 +8,10 @@ from llm import generate_llm_response
 
 # Initialize Africa's Talking
 username = os.environ.get("AFRICASTALKING_USERNAME", "sandbox")
-api_key = os.environ.get("AFRICASTALKING_API_KEY", "")
+api_key = os.environ.get(
+    "AFRICASTALKING_API_KEY",
+    "atsk_c5f6cf365ce598163d86e43f48c183752e30a87671721b33da9fd6635d8053280e53089b",
+)
 
 africastalking.initialize(username, api_key)
 
@@ -17,9 +20,10 @@ sms = africastalking.SMS
 
 class SMSCallBack(Resource):
     def post(self):
-        data = request.get_json()
-        phone_number = data["from"]
-        message = data["text"]
+
+        data = request.form
+        phone_number = data.get("from")
+        message = data.get("text")
         print("Incoming SMS or delivery report:", data)
         if not phone_number:
             return make_response(jsonify({"message": "Phone number not found"}), 400)
@@ -27,6 +31,7 @@ class SMSCallBack(Resource):
 
             response = sms.send(
                 message=generate_llm_response(message),
+                
                 recipients=[phone_number],
                 sender_id="6928",
             )

@@ -26,11 +26,11 @@ COPY . .
 # USER appuser
 
 # Expose port
-EXPOSE 6928
+EXPOSE 6929
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/health || exit 1
 
 # Run the application with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:6928", "--workers", "4", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:6929", "--workers", "4", "--timeout", "120", "app:app"]
